@@ -201,7 +201,7 @@ class _MapViewMainState extends State<MapViewMain> {
         .collection("RequestAccepted")
         .doc(widget.userPersonalData.patientID)
         .set({
-      'Driver_Location': GeoPoint(userLocation?.latitude, userLocation?.longitude)
+      'Driver_Location': GeoPoint(userLocation?.latitude, userLocation?.longitude),'Driver_Name' : FirebaseAuth.instance.currentUser.displayName
     }).then((_) {
       _getPolyline();
     });

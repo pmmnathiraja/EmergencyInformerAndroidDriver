@@ -375,7 +375,7 @@ class _SignalDetectState extends State<SignalDetect> {
         .doc(userDetails.patientID)
         .set({
       'Driver_Location':
-      GeoPoint(userDetails.driverLatitude, userDetails.driverLongitude)
+      GeoPoint(userDetails.driverLatitude, userDetails.driverLongitude),'Driver_Name' : FirebaseAuth.instance.currentUser.displayName
     }).then((_) {
       FirebaseFirestore.instance
           .collection("RequestPool")
