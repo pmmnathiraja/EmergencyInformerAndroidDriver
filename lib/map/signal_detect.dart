@@ -401,6 +401,7 @@ class _SignalDetectState extends State<SignalDetect> {
         Future(() {
           Future.delayed(Duration(seconds: 1));
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            onPressed = 0 ;
             Navigator.of(context).pushReplacement(
                 new MaterialPageRoute(builder: (BuildContext context) {
                   return DriverLocationPage(userDetails);
