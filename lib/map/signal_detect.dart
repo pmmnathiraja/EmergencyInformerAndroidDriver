@@ -53,23 +53,30 @@ class LocationService {
     }
     return _currentLocation;
   }
-  void uploadFirebase(){
-    FirebaseDatabase.instance.reference().child("EmergencyLocation").once().then((DataSnapshot snapshot){
-      if(snapshot.value != null){
+
+  void uploadFirebase() {
+    FirebaseDatabase.instance
+        .reference()
+        .child("EmergencyLocation")
+        .once()
+        .then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
         Map<dynamic, dynamic> valuesGet = snapshot.value;
-        valuesGet.forEach((key,values) {
+        valuesGet.forEach((key, values) {
           double _doubleLatitude = double.parse(values['Latitude']);
           double _doubleLongitude = double.parse(values['Longitude']);
-          FirebaseFirestore.instance
-              .collection("RequestPool")
-              .doc(key)
-              .set({
+          FirebaseFirestore.instance.collection("RequestPool").doc(key).set({
             'User_Location': GeoPoint(_doubleLatitude, _doubleLongitude)
           }).then((_) {
-            FirebaseDatabase.instance.reference().child("EmergencyLocation").child(key).remove();
+            FirebaseDatabase.instance
+                .reference()
+                .child("EmergencyLocation")
+                .child(key)
+                .remove();
           });
         });
-      }});
+      }
+    });
   }
 }
 
@@ -111,8 +118,9 @@ class _SignalDetectState extends State<SignalDetect> {
   var userLocation;
   var initDistance = 1000.0;
   UserData userSet = UserData();
-  String googleAPiKey = 'AIzaSyB8bG_nuTahusw8ms3rKXQSSTwXE9N59cc';
+  String googleAPiKey = 'AIzaSyA8GY4o9vAR6URMqU6c4AE1UGLkfDG8iik';
   var distance;
+  var onPressed = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -122,8 +130,9 @@ class _SignalDetectState extends State<SignalDetect> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: StreamBuilder<QuerySnapshot>(
-            stream:
-                FirebaseFirestore.instance.collection('RequestPool').snapshots(),
+            stream: FirebaseFirestore.instance
+                .collection('RequestPool')
+                .snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
@@ -133,62 +142,67 @@ class _SignalDetectState extends State<SignalDetect> {
                 return Container();
               }
               if (snapshot.data.docs != null) {
-                snapshot.data.docs.map((DocumentSnapshot document) async {
-                  final _driveCurrentLocation =
-                      LatLng(userLocation?.latitude, userLocation?.longitude);
+                if (onPressed == 1) {
+                  return Container();
+                } else {
+                  snapshot.data.docs.map((DocumentSnapshot document) async {
+                    final _driveCurrentLocation =
+                        LatLng(userLocation?.latitude, userLocation?.longitude);
 
-                  document.data().forEach((key, value) {
-                    GeoPoint _userPosition = value;
-                    final _userCurrentLocation =
-                        LatLng(_userPosition.latitude, _userPosition.longitude);
+                    document.data().forEach((key, value) {
+                      GeoPoint _userPosition = value;
+                      final _userCurrentLocation = LatLng(
+                          _userPosition.latitude, _userPosition.longitude);
 
-                    distance = SphericalUtil.computeDistanceBetween(
-                            _driveCurrentLocation, _userCurrentLocation) /
-                        1000.0;
-                    print('Distance between London and Paris is $distance km.');
+                      distance = SphericalUtil.computeDistanceBetween(
+                              _driveCurrentLocation, _userCurrentLocation) /
+                          1000.0;
+                      print(
+                          'Distance between London and Paris is $distance km.');
 
-                    if (distance < initDistance) {
-                      initDistance = distance;
-                      userSet.displayDriverName =
-                          FirebaseAuth.instance.currentUser.displayName;
-                      userSet.userLatitude = _userCurrentLocation.latitude;
-                      userSet.userLongitude = _userCurrentLocation.longitude;
-                      userSet.driverLatitude = userLocation?.latitude;
-                      userSet.driverLongitude = userLocation?.longitude;
-                      userSet.patientID = document.id;
-                      //  patient_ID = value['name'];
-                    }
-                  });
-                  await Future.delayed(Duration(seconds: 1));
-                }).toList();
-                if (initDistance <= 400) {
-                  return Container(
-                    child: Stack(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.only(
-                            top: 80.0,
-                            bottom: 30.0,
-                            left: 30.0,
-                            right: 30.0,
-                          ),
-                          decoration: BoxDecoration(gradient: primaryGradient),
-                          height: MediaQuery.of(context).size.height,
-                          width: MediaQuery.of(context).size.width,
-                          child: Column(
-                            children: <Widget>[
-                              Container(
-                                height: 60.0,
-                                width: MediaQuery.of(context).size.width,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(7.0),
-                                  border: Border.all(color: Colors.white),
-                                  color: Colors.white,
-                                ),
-                                child: RaisedButton(
-                                  elevation: 5.0,
-                                  onPressed: () => {
-                                    updateFirebase(userSet),
+                      if (distance < initDistance) {
+                        initDistance = distance;
+                        userSet.displayDriverName =
+                            FirebaseAuth.instance.currentUser.displayName;
+                        userSet.userLatitude = _userCurrentLocation.latitude;
+                        userSet.userLongitude = _userCurrentLocation.longitude;
+                        userSet.driverLatitude = userLocation?.latitude;
+                        userSet.driverLongitude = userLocation?.longitude;
+                        userSet.patientID = document.id;
+                        //  patient_ID = value['name'];
+                      }
+                    });
+                    await Future.delayed(Duration(seconds: 1));
+                  }).toList();
+                  if (initDistance <= 400) {
+                    return Container(
+                      child: Stack(
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(
+                              top: 80.0,
+                              bottom: 30.0,
+                              left: 30.0,
+                              right: 30.0,
+                            ),
+                            decoration:
+                                BoxDecoration(gradient: primaryGradient),
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  height: 60.0,
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(7.0),
+                                    border: Border.all(color: Colors.white),
+                                    color: Colors.white,
+                                  ),
+                                  child: RaisedButton(
+                                    elevation: 5.0,
+                                    onPressed: () => {
+                                      updateFirebase(userSet),
 //                                    Future.delayed(Duration(seconds: 1)),
 //                                    Future(() {
 //                                      WidgetsBinding.instance
@@ -201,19 +215,83 @@ class _SignalDetectState extends State<SignalDetect> {
 //                                            ));
 //                                      });
 //                                    }),
-                                  },
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(7.0),
-                                  ),
-                                  child: Text(
-                                    'Emergency',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 20.0,
+                                    },
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7.0),
+                                    ),
+                                    child: Text(
+                                      'Emergency',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 20.0,
+                                      ),
                                     ),
                                   ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 10.0),
+                              child: Container(
+                                height: 500.0,
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AvailableImages.homePage,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                    //   });
+                  }
+
+                  return Container(
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.only(top: 70.0),
+                          decoration: BoxDecoration(gradient: primaryGradient),
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                height: 200.0,
+                                width: 200.0,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AvailableImages.appLogo,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  Text(
+                                    'Emergency',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 50.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Informer",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 30.0,
+                                        fontWeight: FontWeight.w500),
+                                  )
+                                ],
                               ),
                             ],
                           ),
@@ -223,7 +301,7 @@ class _SignalDetectState extends State<SignalDetect> {
                           child: Padding(
                             padding: EdgeInsets.only(left: 10.0),
                             child: Container(
-                              height: 500.0,
+                              height: 400.0,
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
@@ -237,70 +315,7 @@ class _SignalDetectState extends State<SignalDetect> {
                       ],
                     ),
                   );
-                  //   });
                 }
-
-                return Container(
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.only(top: 70.0),
-                        decoration: BoxDecoration(gradient: primaryGradient),
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              height: 200.0,
-                              width: 200.0,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AvailableImages.appLogo,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Text(
-                                  'Emergency',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 50.0,
-                                  ),
-                                ),
-                                Text(
-                                  "Informer",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 30.0,
-                                      fontWeight: FontWeight.w500),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 10.0),
-                          child: Container(
-                            height: 400.0,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AvailableImages.homePage,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                );
               } else {
                 return Container(
                   child: Stack(
@@ -375,7 +390,8 @@ class _SignalDetectState extends State<SignalDetect> {
         .doc(userDetails.patientID)
         .set({
       'Driver_Location':
-      GeoPoint(userDetails.driverLatitude, userDetails.driverLongitude),'Driver_Name' : FirebaseAuth.instance.currentUser.displayName
+          GeoPoint(userDetails.driverLatitude, userDetails.driverLongitude),
+      'Driver_Name': FirebaseAuth.instance.currentUser.displayName
     }).then((_) {
       FirebaseFirestore.instance
           .collection("RequestPool")
@@ -385,11 +401,10 @@ class _SignalDetectState extends State<SignalDetect> {
         Future(() {
           Future.delayed(Duration(seconds: 1));
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DriverLocationPage(userDetails),
-                ));
+            Navigator.of(context).pushReplacement(
+                new MaterialPageRoute(builder: (BuildContext context) {
+                  return DriverLocationPage(userDetails);
+                }));
           });
         });
       });

@@ -201,7 +201,7 @@ class _MapViewMainState extends State<MapViewMain> {
         .collection("RequestAccepted")
         .doc(widget.userPersonalData.patientID)
         .set({
-      'Driver_Location': GeoPoint(userLocation?.latitude, userLocation?.longitude),'Driver_Name' : FirebaseAuth.instance.currentUser.displayName
+      'Driver_Location': GeoPoint(userLocation?.latitude, userLocation?.longitude),'User_Location': GeoPoint(_destLatitude, _destLongitude),'Driver_Name' : FirebaseAuth.instance.currentUser.displayName
     }).then((_) {
       _getPolyline();
     });
@@ -246,11 +246,15 @@ class _MapViewMainState extends State<MapViewMain> {
         .then((_) {
       Future(() {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ReachHospitalPage(),
-              ));
+//          Navigator.push(
+//              context,
+//              MaterialPageRoute(
+//                builder: (context) => ReachHospitalPage(),
+//              ));
+          Navigator.of(context).pushReplacement(
+              new MaterialPageRoute(builder: (BuildContext context) {
+                return ReachHospitalPage();
+              }));
         });
       });
     });

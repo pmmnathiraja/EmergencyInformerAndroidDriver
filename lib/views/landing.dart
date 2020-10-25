@@ -5,6 +5,7 @@ import 'package:driver/utils/colors.dart';
 import 'package:driver/utils/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:location_permissions/location_permissions.dart';
 
 class LandingPage extends StatefulWidget {
   LandingPage({Key key, this.title}) : super(key: key);
@@ -16,6 +17,7 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage>{
 @override
   Widget build(BuildContext context) {
+  Future<PermissionStatus> permission = LocationPermissions().requestPermissions();
     // Change Status Bar Color
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: primaryColor),
@@ -138,7 +140,7 @@ class _LandingPageState extends State<LandingPage>{
               child: Padding(
                 padding: EdgeInsets.only(left: 10.0),
                 child: Container(
-                  height: 100.0,
+                  height: 200.0,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     image: DecorationImage(
