@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:driver/api/food_api.dart';
+import 'package:driver/app.dart';
 import 'package:driver/notifier/auth_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -95,7 +97,7 @@ class SignalLocationPage extends StatelessWidget {
       create: (context) => LocationService().locationStream,
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
+          title: 'Flutter',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
@@ -124,11 +126,25 @@ class _SignalDetectState extends State<SignalDetect> {
 
   @override
   Widget build(BuildContext context) {
+    User _firebaseUser = FirebaseAuth.instance.currentUser;
     userLocation = Provider.of<UserLocation>(context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.orangeAccent,
+          actions: <Widget>[
+            // action button
+            FlatButton(
+              onPressed: () => setupSignOut(_firebaseUser) ,
+              child: Text(
+                "Logout",
+                style: TextStyle(fontSize: 23, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('RequestPool')
@@ -221,7 +237,7 @@ class _SignalDetectState extends State<SignalDetect> {
                                       borderRadius: BorderRadius.circular(7.0),
                                     ),
                                     child: Text(
-                                      'Emergency',
+                                      'EMERGENCY',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 20.0,
@@ -301,7 +317,7 @@ class _SignalDetectState extends State<SignalDetect> {
                           child: Padding(
                             padding: EdgeInsets.only(left: 10.0),
                             child: Container(
-                              height: 400.0,
+                              height: 200.0,
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
@@ -364,7 +380,7 @@ class _SignalDetectState extends State<SignalDetect> {
                         child: Padding(
                           padding: EdgeInsets.only(left: 10.0),
                           child: Container(
-                            height: 400.0,
+                            height: 200.0,
                             width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
                               image: DecorationImage(
@@ -410,5 +426,12 @@ class _SignalDetectState extends State<SignalDetect> {
         });
       });
     });
+  }
+  void setupSignOut(User _firebaseUser){
+    signOut(_firebaseUser);
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return App();
+    }));
   }
 }

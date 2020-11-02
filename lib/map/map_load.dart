@@ -253,7 +253,7 @@ class _MapViewMainState extends State<MapViewMain> {
 //              ));
           Navigator.of(context).pushReplacement(
               new MaterialPageRoute(builder: (BuildContext context) {
-                return ReachHospitalPage();
+                return ReachHospitalPage(userDetails.patientID);
               }));
         });
       });
